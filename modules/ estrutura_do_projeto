@@ -1,0 +1,22 @@
+/gestao_aluguel
+│
+├── main.py                # Ponto de entrada da aplicação
+├── database.py            # Configuração do banco de dados
+├── requirements.txt        # Dependências do projeto
+│
+├── /modules
+│   ├── __init__.py
+│   ├── clientes.py         # Gestão de clientes
+│   ├── funcionarios.py     # Gestão de funcionários
+│   ├── estoque.py         # Gestão de materiais/estoque
+│   ├── alugueis.py        # Processos de aluguel
+│   ├── financeiro.py      # Faturas e pagamentos
+│   ├── relatorios.py      # Relatórios e históricos
+│   ├── notificacoes.py    # Sistema de notificações
+│   └── config.py          # Configurações da aplicação
+│
+├── /templates             # Templates para relatórios/faturas
+│   └── fatura.html
+│
+└── /static               # Arquivos estáticos (CSS, imagens)
+    └── styles.css
