@@ -1,22 +1,34 @@
-/gestao_aluguel
+gestao_aluguel/
 │
-├── main.py                # Ponto de entrada da aplicação
+├── main.py                # Ponto de entrada do sistema
 ├── database.py            # Configuração do banco de dados
-├── requirements.txt        # Dependências do projeto
+├── requirements.txt       # Dependências do projeto
+├── config.ini            # (Opcional) Configurações do sistema
 │
-├── /modules
+├── assets/               # Arquivos estáticos
+│   ├── logo.png          # Logo da empresa
+│   └── styles.css        # (Opcional) Estilos adicionais
+│
+├── backups/              # Backups automáticos do banco de dados
+├── relatorios/           # Relatórios gerados em PDF/HTML
+│
+├── modules/              # Módulos do sistema
 │   ├── __init__.py
-│   ├── clientes.py         # Gestão de clientes
-│   ├── funcionarios.py     # Gestão de funcionários
-│   ├── estoque.py         # Gestão de materiais/estoque
-│   ├── alugueis.py        # Processos de aluguel
-│   ├── financeiro.py      # Faturas e pagamentos
-│   ├── relatorios.py      # Relatórios e históricos
-│   ├── notificacoes.py    # Sistema de notificações
-│   └── config.py          # Configurações da aplicação
+│   ├── auth.py           # Autenticação e login
+│   ├── setup.py          # Configuração inicial
+│   ├── clientes.py       # Gestão de clientes
+│   ├── funcionarios.py   # Gestão de funcionários
+│   ├── estoque.py        # Gestão de inventário
+│   ├── alugueis.py       # Processos de aluguel
+│   ├── financeiro.py     # Faturas e pagamentos
+│   ├── notificacoes.py   # Sistema de alertas
+│   └── relatorios.py     # Geração de relatórios
 │
-├── /templates             # Templates para relatórios/faturas
-│   └── fatura.html
+├── templates/            # Templates HTML
+│   ├── base.html         # Layout principal
+│   ├── fatura.html       # Template de faturas
+│   └── relatorio.html    # Template de relatórios
 │
-└── /static               # Arquivos estáticos (CSS, imagens)
-    └── styles.css
+└── tests/                # Testes automatizados
+    ├── unit/             # Testes unitários
+    └── integration/      # Testes de integraçãos
