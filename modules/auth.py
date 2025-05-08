@@ -102,9 +102,3 @@ class AuthSystem:
     def __del__(self):
         if hasattr(self, 'conn') and self.conn:
             self.conn.close()
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    root.geometry("600x600")
-    auth = AuthSystem(root)
-    root.mainloop()

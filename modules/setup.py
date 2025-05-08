@@ -139,7 +139,7 @@ class FirstRunSetup:
         self.admin_name = ttk.Entry(form_frame)
         self.admin_name.grid(row=0, column=1, pady=5, padx=5, sticky="ew")
 
-        ttk.Label(form_frame, text="CPF:").grid(row=1, column=0, sticky="e", pady=5)
+        ttk.Label(form_frame, text="BI:").grid(row=1, column=0, sticky="e", pady=5)
         self.admin_cpf = ttk.Entry(form_frame)
         self.admin_cpf.grid(row=1, column=1, pady=5, padx=5, sticky="ew")
 
@@ -337,13 +337,13 @@ class FirstRunSetup:
             return False
 
         if not self.admin_cpf.get():
-            messagebox.showerror("Erro", "O CPF do administrador é obrigatório!")
+            messagebox.showerror("Erro", "O BI do administrador é obrigatório!")
             return False
 
-        # Validação básica de CPF (apenas verifica se tem 11 dígitos)
+        # Validação básica de BI (apenas verifica se tem 11 dígitos)
         cpf = ''.join(filter(str.isdigit, self.admin_cpf.get()))
         if len(cpf) != 11:
-            messagebox.showerror("Erro", "CPF inválido! Deve conter 11 dígitos.")
+            messagebox.showerror("Erro", "BI inválido! Deve conter 11 dígitos.")
             return False
 
         if not self.admin_username.get():
@@ -415,7 +415,7 @@ class FirstRunSetup:
 
             cursor.execute("""
                 INSERT INTO funcionarios (
-                    nome, cpf, email, usuario, senha, is_admin, cargo, salario
+                    nome, bi, email, usuario, senha, is_admin, cargo, salario
                 ) VALUES (?, ?, ?, ?, ?, 1, 'Administrador', 0)
             """, (
                 self.admin_name.get(),

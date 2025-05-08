@@ -14,6 +14,7 @@ class FuncionariosModule:
         self.create_widgets()
         self.load_funcionarios()
 
+
     def create_widgets(self):
         # Frame principal
         self.main_frame = ttk.Frame(self.parent)
@@ -23,7 +24,7 @@ class FuncionariosModule:
         search_frame = ttk.LabelFrame(self.main_frame, text="Buscar Funcionário", bootstyle="info")
         search_frame.pack(fill="x", pady=(0, 10))
 
-        ttk.Label(search_frame, text="Nome/CPF/Usuário:").pack(side="left", padx=5)
+        ttk.Label(search_frame, text="Nome/BI/Usuário:").pack(side="left", padx=5)
         self.search_entry = ttk.Entry(search_frame)
         self.search_entry.pack(side="left", padx=5, fill="x", expand=True)
 
@@ -80,7 +81,7 @@ class FuncionariosModule:
         remove_btn.pack(side="left", padx=5)
 
         # Tabela de funcionários
-        columns = ("id", "nome", "usuario", "cpf", "cargo", "is_admin", "status")
+        columns = ("id", "nome", "usuario", "bi", "cargo", "is_admin", "status")
         self.tree = ttk.Treeview(
             self.main_frame,
             columns=columns,
@@ -93,7 +94,7 @@ class FuncionariosModule:
         self.tree.heading("id", text="ID")
         self.tree.heading("nome", text="Nome")
         self.tree.heading("usuario", text="Usuário")
-        self.tree.heading("cpf", text="CPF")
+        self.tree.heading("bi", text="BI")
         self.tree.heading("cargo", text="Cargo")
         self.tree.heading("is_admin", text="Nível Acesso")
         self.tree.heading("status", text="Status")
@@ -102,7 +103,7 @@ class FuncionariosModule:
         self.tree.column("id", width=50, anchor="center")
         self.tree.column("nome", width=150)
         self.tree.column("usuario", width=100)
-        self.tree.column("cpf", width=120, anchor="center")
+        self.tree.column("bi", width=120, anchor="center")
         self.tree.column("cargo", width=120)
         self.tree.column("is_admin", width=100, anchor="center")
         self.tree.column("status", width=80, anchor="center")
@@ -122,7 +123,7 @@ class FuncionariosModule:
         """Carrega todos os funcionários na tabela"""
         cursor = self.conn.cursor()
         cursor.execute("""
-            SELECT id, nome, usuario, cpf, cargo, is_admin, 
+            SELECT id, nome, usuario, bi, cargo, is_admin, 
                    CASE WHEN ativo = 1 THEN 'Ativo' ELSE 'Inativo' END as status
             FROM funcionarios
             ORDER BY nome
@@ -139,21 +140,21 @@ class FuncionariosModule:
             ), tags=tags)
 
     def search_funcionario(self):
-        """Busca funcionários por nome, CPF ou usuário"""
+        """Busca funcionários por nome, BI ou usuário"""
         search_term = self.search_entry.get()
         cursor = self.conn.cursor()
 
         if search_term:
             cursor.execute("""
-                SELECT id, nome, usuario, cpf, cargo, is_admin,
+                SELECT id, nome, usuario, bi, cargo, is_admin,
                        CASE WHEN ativo = 1 THEN 'Ativo' ELSE 'Inativo' END as status
                 FROM funcionarios
-                WHERE nome LIKE ? OR cpf LIKE ? OR usuario LIKE ?
+                WHERE nome LIKE ? OR bi LIKE ? OR usuario LIKE ?
                 ORDER BY nome
             """, (f"%{search_term}%", f"%{search_term}%", f"%{search_term}%"))
         else:
             cursor.execute("""
-                SELECT id, nome, usuario, cpf, cargo, is_admin,
+                SELECT id, nome, usuario, bi, cargo, is_admin,
                        CASE WHEN ativo = 1 THEN 'Ativo' ELSE 'Inativo' END as status
                 FROM funcionarios
                 ORDER BY nome
@@ -192,7 +193,7 @@ class FuncionariosModule:
         self.nome_entry = ttk.Entry(info_frame)
         self.nome_entry.grid(row=0, column=1, pady=5, padx=5, sticky="ew")
 
-        ttk.Label(info_frame, text="CPF:").grid(row=1, column=0, sticky="e", pady=5)
+        ttk.Label(info_frame, text="BI:").grid(row=1, column=0, sticky="e", pady=5)
         self.cpf_entry = ttk.Entry(info_frame)
         self.cpf_entry.grid(row=1, column=1, pady=5, padx=5, sticky="ew")
 
@@ -303,7 +304,7 @@ class FuncionariosModule:
 
         # Validações
         if not nome or not cpf or not usuario:
-            messagebox.showerror("Erro", "Nome, CPF e Usuário são obrigatórios!")
+            messagebox.showerror("Erro", "Nome, BI e Usuário são obrigatórios!")
             return
 
         if not senha or len(senha) < 6:
@@ -333,16 +334,16 @@ class FuncionariosModule:
         try:
             cursor = self.conn.cursor()
 
-            # Verificar se usuário ou CPF já existem
-            cursor.execute("SELECT id FROM funcionarios WHERE usuario = ? OR cpf = ?", (usuario, cpf))
+            # Verificar se usuário ou BI já existem
+            cursor.execute("SELECT id FROM funcionarios WHERE usuario = ? OR bi = ?", (usuario, cpf))
             if cursor.fetchone():
-                messagebox.showerror("Erro", "Usuário ou CPF já cadastrados!")
+                messagebox.showerror("Erro", "Usuário ou BI já cadastrados!")
                 return
 
             # Inserir novo funcionário
             cursor.execute("""
                 INSERT INTO funcionarios (
-                    nome, cpf, telefone, email, endereco, cargo, salario, 
+                    nome, bi, telefone, email, endereco, cargo, salario, 
                     data_contratacao, usuario, senha, is_admin, ativo
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
@@ -398,7 +399,7 @@ class FuncionariosModule:
         self.edit_nome_entry.grid(row=0, column=1, pady=5, padx=5, sticky="ew")
         self.edit_nome_entry.insert(0, funcionario[1])
 
-        ttk.Label(info_frame, text="CPF:").grid(row=1, column=0, sticky="e", pady=5)
+        ttk.Label(info_frame, text="BI:").grid(row=1, column=0, sticky="e", pady=5)
         self.edit_cpf_entry = ttk.Entry(info_frame)
         self.edit_cpf_entry.grid(row=1, column=1, pady=5, padx=5, sticky="ew")
         self.edit_cpf_entry.insert(0, funcionario[2])
@@ -505,7 +506,7 @@ class FuncionariosModule:
 
         # Validações
         if not nome or not cpf or not usuario:
-            messagebox.showerror("Erro", "Nome, CPF e Usuário são obrigatórios!")
+            messagebox.showerror("Erro", "Nome, BI e Usuário são obrigatórios!")
             return
 
         try:
@@ -524,20 +525,20 @@ class FuncionariosModule:
         try:
             cursor = self.conn.cursor()
 
-            # Verificar se usuário ou CPF já existem (excluindo o próprio funcionário)
+            # Verificar se usuário ou BI já existem (excluindo o próprio funcionário)
             cursor.execute("""
                 SELECT id FROM funcionarios 
-                WHERE (usuario = ? OR cpf = ?) AND id != ?
+                WHERE (usuario = ? OR bi = ?) AND id != ?
             """, (usuario, cpf, self.current_funcionario_id))
 
             if cursor.fetchone():
-                messagebox.showerror("Erro", "Usuário ou CPF já cadastrados para outro funcionário!")
+                messagebox.showerror("Erro", "Usuário ou BI já cadastrados para outro funcionário!")
                 return
 
             # Atualizar funcionário
             cursor.execute("""
                 UPDATE funcionarios SET
-                    nome = ?, cpf = ?, telefone = ?, email = ?, endereco = ?,
+                    nome = ?, bi = ?, telefone = ?, email = ?, endereco = ?,
                     cargo = ?, salario = ?, data_contratacao = ?, usuario = ?,
                     is_admin = ?, ativo = ?
                 WHERE id = ?

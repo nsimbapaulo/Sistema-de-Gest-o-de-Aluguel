@@ -12,6 +12,7 @@ from modules.notificacoes import NotificacoesModule
 from modules.database import create_connection, create_tables,initialize_database
 from modules.auth import AuthSystem
 from modules.setup import FirstRunSetup
+from modules.dashboard import DashboardModule
 
 
 class MainApplication(ttk.Window):
@@ -110,6 +111,7 @@ class MainApplication(ttk.Window):
 
         # Módulos básicos para todos os usuários
         buttons.append(("Aluguéis", "cart", self.show_alugueis))
+        buttons.append(("Dashboard", "speedometer2", self.show_dashboard))
 
         # Módulos restritos para administradores
         if self.current_user['is_admin']:
@@ -142,6 +144,7 @@ class MainApplication(ttk.Window):
         )
         logout_btn.pack(side="bottom", pady=10, padx=10, ipady=5)
 
+
         # Barra de status
         self.status_bar = ttk.Label(self, bootstyle="inverse-dark")
         self.status_bar.pack(side="bottom", fill="x")
@@ -158,10 +161,10 @@ class MainApplication(ttk.Window):
         app = MainApplication()
         app.mainloop()
 
+
     def show_dashboard(self):
         self.clear_content()
-        label = ttk.Label(self.content_frame, text="Dashboard", font=('Helvetica', 18))
-        label.pack(pady=20)
+        DashboardModule(self.content_frame)
 
         # Adicione widgets do dashboard aqui
 

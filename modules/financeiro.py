@@ -2,6 +2,9 @@ import tkinter as tk
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 from tkinter import messagebox
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from reportlab.lib.colors import *
 from .database import create_connection
 from datetime import datetime
 from jinja2 import Template
@@ -224,7 +227,7 @@ class FinanceiroModule:
                 messagebox.showerror("Erro", "Aluguel não encontrado!")
                 return
 
-            valor_total, cliente_nome, cliente_cpf, cliente_endereco = aluguel_info
+            valor_total, cliente_nome, cliente_bi, cliente_endereco = aluguel_info
 
             # Obter itens do aluguel
             cursor.execute("""
@@ -250,14 +253,14 @@ class FinanceiroModule:
             self.conn.commit()
 
             # Gerar HTML da fatura
-            self.gerar_html_fatura(
+            self.gerar_pdf_fatura(
                 aluguel_id,
                 cliente_nome,
-                cliente_cpf,
+                cliente_bi,
                 cliente_endereco,
-                valor_total,
+                metodo_pagamento,
                 itens,
-                metodo_pagamento
+                valor_total
             )
 
             messagebox.showinfo("Sucesso", "Fatura gerada com sucesso!")
@@ -266,97 +269,86 @@ class FinanceiroModule:
         except Exception as e:
             messagebox.showerror("Erro", f"Erro ao gerar fatura: {str(e)}")
 
-    def gerar_html_fatura(self, aluguel_id, cliente_nome, cliente_cpf, cliente_endereco, valor_total, itens,
-                          metodo_pagamento):
-        """Gera um arquivo HTML com a fatura"""
-        template_str = """
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>Fatura #{{ fatura_id }}</title>
-            <style>
-                body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-                .header { text-align: center; margin-bottom: 20px; }
-                .info { margin-bottom: 20px; }
-                table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                th { background-color: #f2f2f2; }
-                .total { text-align: right; font-weight: bold; }
-                .footer { margin-top: 30px; text-align: center; font-size: 0.9em; }
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <h1>Fatura #{{ fatura_id }}</h1>
-                <p>Sistema de Gestão de Aluguel</p>
-            </div>
+    def gerar_pdf_fatura(self, alugel_id, cliente_nome, cliente_bi, cliente_endereco, metodo_pagamento, itens, valor_total):
+        try:
+            def cm_ponto(milimetros: float):
+                """
+                Essa função converte milímtros para ponos
+                :param milimetros: valor em milímetros
+                :return: valor em pontos
+                """
+                return round(10 * (milimetros * 2.83464567))
 
-            <div class="info">
-                <p><strong>Cliente:</strong> {{ cliente_nome }}</p>
-                <p><strong>BI:</strong> {{ cliente_cpf }}</p>
-                <p><strong>Endereço:</strong> {{ cliente_endereco }}</p>
-                <p><strong>Data:</strong> {{ data_emissao }}</p>
-                <p><strong>Método de Pagamento:</strong> {{ metodo_pagamento }}</p>
-            </div>
+            doc_name = f'factura {alugel_id}'
+            doc = f"Facturas/{doc_name}.pdf"
+            datetime.now().strftime("%d/%m/%Y %H:%M")
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Item</th>
-                        <th>Quantidade</th>
-                        <th>Valor Unitário</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in itens %}
-                    <tr>
-                        <td>{{ item[0] }}</td>
-                        <td>{{ item[1] }}</td>
-                        <td>R$ {{ "%.2f"|format(item[2]) }}</td>
-                        <td>R$ {{ "%.2f"|format(item[1] * item[2]) }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            os.makedirs(os.path.dirname(doc), exist_ok=True)
+            w, h = A4
+            const = 50
+            canva = canvas.Canvas(doc, pagesize=A4)
 
-            <div class="total">
-                <p>Total: R$ {{ "%.2f"|format(valor_total) }}</p>
-            </div>
+            # Logotipo da empresa
+            canva.setFont('Helvetica-Bold', 20)
+            canva.drawString(w - 100, h - 60, "Logo")
 
-            <div class="footer">
-                <p>Obrigado por utilizar nossos serviços!</p>
-                <p>Em caso de dúvidas, entre em contato conosco.</p>
-            </div>
-        </body>
-        </html>
-        """
+            # Numero da factura
+            canva.drawString(const, h - (const + cm_ponto(2.5)), f"Fatura nº: {alugel_id}")
 
-        template = Template(template_str)
-        data_emissao = datetime.now().strftime("%d/%m/%Y %H:%M")
+            # Dados do cliente
+            texto = canva.beginText(const, h - (const + cm_ponto(3)))
+            texto.setFont("Courier", 11)
+            texto.textLine(f"Nome: {cliente_nome}")
+            texto.textLine(f"B.I: {cliente_bi}")
+            texto.textLine(f"Endereço: {cliente_endereco}")
+            texto.textLine(f"Data: {datetime.now().strftime("%d/%m/%Y %H:%M")}")
+            texto.textLine(f"Método de Pagamento: {metodo_pagamento}")
 
-        html = template.render(
-            fatura_id=aluguel_id,
-            cliente_nome=cliente_nome,
-            cliente_cpf=cliente_cpf,
-            cliente_endereco=cliente_endereco,
-            data_emissao=data_emissao,
-            valor_total=valor_total,
-            itens=itens,
-            metodo_pagamento=metodo_pagamento
-        )
+            canva.drawText(texto)
 
-        # Criar diretório de faturas se não existir
-        if not os.path.exists("faturas"):
-            os.makedirs("faturas")
+            # Cabeçalho da tabela
+            canva.setFont('Helvetica-Bold', 11)
+            canva.setFillColor(black)  # cor dos rectangulos
+            canva.rect(const, h - (const + cm_ponto(6)), cm_ponto(7), cm_ponto(0.5), fill=1)
+            canva.rect((const + cm_ponto(7.6)), h - (const + cm_ponto(6)), cm_ponto(3), cm_ponto(0.5), fill=1)
+            canva.rect((const + cm_ponto(11.2)), h - (const + cm_ponto(6)), cm_ponto(3), cm_ponto(0.5), fill=1)
+            canva.rect((const + cm_ponto(14.7)), h - (const + cm_ponto(6)), cm_ponto(2.5), cm_ponto(0.5), fill=1)
 
-        file_path = f"faturas/fatura_{aluguel_id}.html"
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.write(html)
+            canva.setFillColor(white)  # cor das letrsa
+            canva.drawString(const + cm_ponto(1.9), h - (const + cm_ponto(5.9)), "Item")
+            canva.drawString((const + cm_ponto(7.9)), h - (const + cm_ponto(5.9)), "Quantidade")
+            canva.drawString((const + cm_ponto(11.9)), h - (const + cm_ponto(5.9)), "Unidade")
+            canva.drawString((const + cm_ponto(15.3)), h - (const + cm_ponto(5.9)), "Total")
 
-        # Abrir no navegador
-        webbrowser.open(f"file://{os.path.abspath(file_path)}")
+            # Dados da Tabela
+            canva.setFillColor(black)  # cor das letrsa
+            canva.setFont('Helvetica', 11)
+
+            expaco = 6.5
+            expaco_ = 6.6
+            add = 0.5
+            for item in itens:
+                canva.drawString(const + cm_ponto(0.1), h - (const + cm_ponto(expaco)), f"{item[0]}")
+                canva.drawString((const + cm_ponto(8.7)), h - (const + cm_ponto(expaco)), f"{item[1]}")
+                canva.drawString((const + cm_ponto(12.2)), h - (const + cm_ponto(expaco)), f"{item[2]}")
+                canva.drawString((const + cm_ponto(15.3)), h - (const + cm_ponto(expaco)), f"{item[1] * item[2]}")
+                canva.line(const, h - (const + cm_ponto(expaco_)), cm_ponto(19), h - (const + cm_ponto(expaco_)))
+
+                expaco += add
+                expaco_ += add
+
+            canva.setFont("Helvetica-Bold", 12, )
+            canva.drawString((const + cm_ponto(13.7)), h - (const + cm_ponto(expaco + add)), f"Total: {valor_total} kz")
+
+            canva.showPage()
+            canva.save()
+
+            webbrowser.open_new(f"file://{os.path.abspath(doc)}")
+
+            return doc
+        except Exception as e:
+            messagebox.showerror("Erro", f"Falha ao gerar PDF:. {str(e)}")
+            return None
 
     def print_fatura(self):
         """Imprime a fatura selecionada"""
@@ -368,7 +360,7 @@ class FinanceiroModule:
         item = self.tree.item(selected)
         fatura_id = item['values'][0]
 
-        file_path = f"faturas/fatura_{fatura_id}.html"
+        file_path = f"Facturas/factura {fatura_id}.pdf"
         if os.path.exists(file_path):
             webbrowser.open(f"file://{os.path.abspath(file_path)}")
         else:

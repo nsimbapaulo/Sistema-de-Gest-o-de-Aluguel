@@ -47,7 +47,7 @@ def create_tables(conn):
                 CREATE TABLE IF NOT EXISTS funcionarios (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     nome TEXT NOT NULL,
-                    cpf TEXT UNIQUE,
+                    bi TEXT UNIQUE,
                     telefone TEXT,
                     email TEXT,
                     endereco TEXT,
