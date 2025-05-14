@@ -1,8 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import ttkbootstrap as ttk
-from ttkbootstrap.constants import *
-from .database import create_connection
+from modules.models.database import create_connection
 import hashlib
 import os
 import shutil  # para manipulação de arquivos

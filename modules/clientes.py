@@ -1,8 +1,7 @@
-import tkinter as tk
 import ttkbootstrap as ttk
-from ttkbootstrap.constants import *
 from tkinter import messagebox
-from .database import create_connection
+from modules.models.database import create_connection
+from modules.models.model import view_table
 
 
 class ClientesModule:
@@ -92,9 +91,9 @@ class ClientesModule:
 
     def load_clientes(self):
         """Carrega todos os clientes na tabela"""
-        cursor = self.conn.cursor()
-        cursor.execute("SELECT id, nome, bi, telefone, email, data_cadastro FROM clientes")
-        rows = cursor.fetchall()
+        # cursor = self.conn.cursor()
+        # cursor.execute("SELECT id, nome, bi, telefone, email, data_cadastro FROM clientes")
+        rows = view_table("clientes", "id, nome, bi, telefone, email, data_cadastro")
 
         self.tree.delete(*self.tree.get_children())
         for row in rows:

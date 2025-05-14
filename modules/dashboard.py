@@ -1,10 +1,8 @@
-import tkinter as tk
 import ttkbootstrap as ttk
 from tkinter import messagebox
-from ttkbootstrap.constants import *
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from .database import create_connection
+from modules.models.database import create_connection
 
 
 class DashboardModule:

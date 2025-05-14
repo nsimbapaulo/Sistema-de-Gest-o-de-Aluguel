@@ -1,10 +1,8 @@
 # Módulo de Autenticação
 
-import tkinter as tk
 import ttkbootstrap as ttk
-from ttkbootstrap.constants import *
 from tkinter import messagebox
-from .database import create_connection
+from modules.models.database import create_connection
 import hashlib
 
 

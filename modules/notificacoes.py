@@ -1,9 +1,7 @@
 import tkinter as tk
 import ttkbootstrap as ttk
-from ttkbootstrap.constants import *
 from tkinter import messagebox
-from .database import create_connection
-from datetime import datetime
+from modules.models.database import create_connection
 
 
 class NotificacoesModule:

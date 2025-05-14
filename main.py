@@ -1,7 +1,5 @@
-import tkinter as tk
 import ttkbootstrap as ttk
 from tkinter import messagebox
-from ttkbootstrap.constants import *
 from modules.clientes import ClientesModule
 from modules.funcionarios import FuncionariosModule
 from modules.estoque import EstoqueModule
@@ -9,7 +7,7 @@ from modules.alugueis import AlugueisModule
 from modules.financeiro import FinanceiroModule
 from modules.relatorios import RelatoriosModule
 from modules.notificacoes import NotificacoesModule
-from modules.database import create_connection, create_tables,initialize_database
+from modules.models.database import create_connection, initialize_database
 from modules.auth import AuthSystem
 from modules.setup import FirstRunSetup
 from modules.dashboard import DashboardModule

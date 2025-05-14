@@ -136,7 +136,6 @@ def create_tables(conn):
             """
    ]
 
-
         # Executa todos os comandos
         for table in tables:
             cursor.execute(table)

@@ -1,13 +1,10 @@
-import tkinter as tk
 import ttkbootstrap as ttk
-from ttkbootstrap.constants import *
 from tkinter import messagebox
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib.colors import *
-from .database import create_connection
+from modules.models.database import create_connection
 from datetime import datetime
-from jinja2 import Template
 import webbrowser
 import os
 
